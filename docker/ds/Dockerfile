@@ -25,22 +25,25 @@ FROM openjdk:11-jdk
 #ENV JAVA_HOME="$(/usr/libexec/java_home)"
 RUN jlink --compress=2 \
    --add-modules java.base,java.compiler,java.desktop,java.instrument,java.management.rmi,java.prefs,java.scripting,java.security.jgss,java.security.sasl,java.sql,jdk.security.auth,jdk.unsupported \
-   --output /var/tmp/jdk
+   --output /var/tmp/jdk \
+   && apt-get update && apt-get install -y binutils \ 
+   && strip -p --strip-unneeded /var/tmp/jdk/lib/server/libjvm.so
+
 
 #####################  Runtime container ################
 #FROM openjdk:11-jdk
 FROM debian:sid-slim
 
 ENV TINI_VERSION v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin
-RUN chmod +x /usr/bin/tini
+#ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin
+#RUN chmod +x /usr/bin/tini
 
 COPY --from=1 /var/tmp/bootstrap/run/dsrs1 /opt/opendj/
 COPY --from=2 /var/tmp/jdk /opt/opendj/jdk/
 
 RUN useradd -d /opt/opendj -G root -m -u 11111 forgerock \
     && apt-get update \
-    && apt-get install -y --no-install-recommends dumb-init vim fio bzip2 unzip \
+    && apt-get install -y --no-install-recommends dumb-init tini vim fio bzip2 unzip \
     && rm -rf /var/lib/apt/lists/* 
 
    
