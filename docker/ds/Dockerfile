@@ -9,9 +9,10 @@ RUN download -v $VERSION opendj
 FROM openjdk:11-jdk as dsbuilder
 COPY --from=downloader /opendj.zip /var/tmp/opendj.zip
 
+COPY bootstrap/ /var/tmp/bootstrap/
+
 WORKDIR /var/tmp/bootstrap
 
-COPY bootstrap/ /var/tmp/bootstrap/
 
 # This speeds up docker cloudbuild considerably
 ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"
