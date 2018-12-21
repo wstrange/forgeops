@@ -29,8 +29,8 @@ RUN jlink --compress=2 \
 
 
 #####################  Runtime container ################
-FROM debian:sid-slim
-
+#FROM debian:sid-slim
+FROM marketplace.gcr.io/google/debian9:latest
 
 RUN useradd -d /opt/opendj -G root -m -u 11111 forgerock \
     && apt-get update \
